@@ -4,9 +4,6 @@ import OpenAI from 'openai';
 import { agentFunctions } from './functions';
 import { NativeModules } from 'react-native';
 
-// 1. Initialize APIs
-// const bot = new Telegraf('8217039452:AAE8IRMBUS6NHjHKdl824zJYnvytQLZBe8E');
-
 // Connect to LM Studio's local OpenAI-compatible endpoint
 const openai = new OpenAI({ 
     baseURL: 'http://192.168.1.5:1234/v1', // Default LM Studio port
