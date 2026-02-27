@@ -30,7 +30,7 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
 const handleToolCall = new HandleToolCall();
 
     chatHistory.push({ role: "user", content: userMessage });
-
+    
     try {
         // Step 1: Send to LM Studio using standard Fetch
         let rawResponse = await fetch(LM_STUDIO_URL, {

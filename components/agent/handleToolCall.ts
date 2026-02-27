@@ -4,7 +4,7 @@ import { NativeModules } from "react-native";
 export class HandleToolCall {
 
 
-handle(aiMessage:any,setBackgroundColor?: (color: string) => void){
+    async  handle(aiMessage:any,setBackgroundColor?: (color: string) => void){
     var chatHistory: any[] = [];
     for (const toolCall of aiMessage.tool_calls) {
             
@@ -21,6 +21,17 @@ handle(aiMessage:any,setBackgroundColor?: (color: string) => void){
                 this.sendSMS(args.phoneNumber, args.messageText);
                 localResult = `SMS sent to ${args.phoneNumber}: ${args.messageText}`;
             }
+            else if (toolCall.function.name === "read_contacts") {
+                // For simplicity, we return a static list. You can implement actual contact reading logic here.
+                
+                // localResult = await this.getContacts();
+                const contacts = await NativeModules.contactsModule.getContacts(args.searchQuery);
+               
+                console.log("Search Query:", args.searchQuery);
+                    console.log("Contacts:", contacts);
+                    localResult = contacts;
+                
+             }
             // Append the Observation
             chatHistory.push({
                 role: "tool",
@@ -31,6 +42,14 @@ handle(aiMessage:any,setBackgroundColor?: (color: string) => void){
 
 }
 
+// async getContacts (): Promise<string> {
+//     return new Promise((resolve) => {
+//         NativeModules.contactsModule.getContacts((searchQuery: string) => {
+//             console.log("Contacts:", contacts);
+//             resolve(contacts);
+//         });
+// });
+// }
 
 
 // 3. Local Execution Functions

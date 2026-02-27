@@ -1,48 +1,5 @@
 export const agentFunctions = [
-    {
-            type: "function",
-            function: {
-                name: "check_netrise_status",
-                description: "Check the current server status of a specific system.",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        systemName: { type: "string", description: "The system to check, e.g., 'database', 'auth', or 'api'" }
-                    },
-                    required: ["systemName"]
-                }
-            }
-        },
-        {
-            type: "function",
-            function: {
-                name: "add_to_calendar",
-                description: "Add a new event or meeting to the calendar.",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        eventTitle: { type: "string", description: "The name of the event" },
-                        eventDate: { type: "string", description: "The date and time" }
-                    },
-                    required: ["eventTitle", "eventDate"]
-                }
-            }
-        },
-        {
-            type: "function",
-            function: {
-                name: "send_whatsapp_message",
-                description: "Send a WhatsApp text message.",
-                parameters: {
-                    type: "object",
-                    properties: {
-                        contactName: { type: "string", description: "The name of the person" },
-                        messageText: { type: "string", description: "The text message to send" }
-                    },
-                    required: ["contactName", "messageText"]
-                }
-            }
-        },
+    
         {
             type: "function",
             function: {
@@ -72,4 +29,18 @@ export const agentFunctions = [
                 }
             }
         },
+        {
+            type: "function",
+            function: {
+                name: "read_contacts",
+                description: "Read the user's contacts and return a list of names and phone numbers.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        searchQuery: { type: "string", description: "Optional search query to filter contacts by name" }
+                    },
+                    required: []
+                }
+            }
+        }
 ] 

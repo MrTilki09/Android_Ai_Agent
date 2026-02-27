@@ -24,6 +24,7 @@ export function Home() {
             'android.permission.INTERNET' as any,
             'android.permission.SCHEDULE_EXACT_ALARM' as any,
             'android.permission.USE_EXACT_ALARM' as any,
+            'android.permission.READ_CONTACTS' as any,
         ])
             .then((results) => {
                 const allGranted = Object.values(results).every(
@@ -98,12 +99,16 @@ export function Home() {
                         </Text>
                     </View>
                 ))}
-
                 {mutation.status === "pending" && (
                     <View className="my-1 self-start rounded-2xl rounded-bl-sm bg-[#21262d] px-4 py-2">
                         <Text className="text-gray-400">●●●</Text>
                     </View>
                 )}
+                <View 
+                style={{paddingBottom: 100}}
+                
+                ></View>
+                
             </ScrollView>
 
             {/* Input Bar */}

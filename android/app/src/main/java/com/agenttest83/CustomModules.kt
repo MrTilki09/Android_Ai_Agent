@@ -7,7 +7,7 @@ import com.facebook.react.uimanager.ViewManager
 
 import com.agenttest83.agentfeatures.agentFeaturesModule
 import com.agenttest83.sms.smsModule
-
+import com.agenttest83.contacts.contactsModule
 
 class CustomModules : ReactPackage {
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
@@ -20,7 +20,7 @@ class CustomModules : ReactPackage {
 
         modules.add(agentFeaturesModule(reactContext))
         modules.add(smsModule(reactContext))
-
+        modules.add(contactsModule(reactContext))
         return modules
     }
 }
