@@ -4,6 +4,10 @@ import { startAgent } from "../components/agent";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { NativeModules } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import DrawerButton from "../components/buttons/DrawerButton";
+import RenderMessage from "../components/app/RenderMessage";
 // const { agentFeatures } = NativeModules;  // matches getName() return value
 
 type Message = {
@@ -16,6 +20,7 @@ export function Home() {
     const [messages, setMessages] = useState<Message[]>([]);
     const scrollRef = useRef<ScrollView>(null);
     const { backgroundColor, setBackgroundColor } = useTheme();
+    const navigation = useNavigation<DrawerNavigationProp<any>>();
 
     useEffect(() => {
         PermissionsAndroid.requestMultiple([
@@ -44,7 +49,7 @@ export function Home() {
             });
     }, []);
 
-// agentFeatures.sendCoolNotification("Agent Module Loaded", "The agent is ready to receive commands.");
+    // agentFeatures.sendCoolNotification("Agent Module Loaded", "The agent is ready to receive commands.");
     const mutation = useMutation({
         mutationFn: (message: string) => startAgent(message, setBackgroundColor),
         onSuccess: (data) => {
@@ -72,11 +77,15 @@ export function Home() {
             keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
         >
             {/* Header */}
-            <View className="items-center border-b border-gray-700 bg-[#161b22] px-4 py-3 pt-10">
-                <Text className="text-base font-semibold text-white">AI Agent</Text>
-                <Text className="text-xs text-green-400">
-                    {mutation.status === "pending" ? "typing..." : "online"}
-                </Text>
+            <View className="flex-row items-center border-b border-gray-700 bg-[#161b22] px-4 py-3 pt-10">
+               <DrawerButton />
+                <View className="flex-1 items-center">
+                    <Text className="text-base font-semibold text-white">AI Agent</Text>
+                    <Text className="text-xs text-green-400">
+                        {mutation.status === "pending" ? "typing..." : "online"}
+                    </Text>
+                </View>
+                <View style={{ width: 24 }} />
             </View>
 
             {/* Messages */}
@@ -86,29 +95,18 @@ export function Home() {
                 onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
             >
                 {messages.map((msg, i) => (
-                    <View
-                        key={i}
-                        className={`my-1 max-w-[80%] rounded-2xl px-4 py-2 ${
-                            msg.role === "user"
-                                ? "self-end rounded-br-sm bg-blue-600"
-                                : "self-start rounded-bl-sm bg-[#21262d]"
-                        }`}
-                    >
-                        <Text className={msg.role === "user" ? "text-white" : "text-gray-200"}>
-                            {msg.content}
-                        </Text>
-                    </View>
+                    <RenderMessage key={i} content={msg.content} role={msg.role} />
                 ))}
                 {mutation.status === "pending" && (
                     <View className="my-1 self-start rounded-2xl rounded-bl-sm bg-[#21262d] px-4 py-2">
                         <Text className="text-gray-400">●●●</Text>
                     </View>
                 )}
-                <View 
-                style={{paddingBottom: 100}}
-                
+                <View
+                    style={{ paddingBottom: 100 }}
+
                 ></View>
-                
+
             </ScrollView>
 
             {/* Input Bar */}
