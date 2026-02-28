@@ -53,8 +53,10 @@ export class HandleToolCall {
                         `Send SMS to ${args.phoneNumber}?\n\nMessage: "${args.messageText}"`
                     );
                     if (smsConfirmed) {
-                        this.sendSMS(args.phoneNumber, args.messageText);
-                        localResult = `SMS sent to ${args.phoneNumber}: ${args.messageText}`;
+                        // Ensure phoneNumber is a string
+                        const phoneNumberStr = String(args.phoneNumber);
+                        this.sendSMS(phoneNumberStr, args.messageText);
+                        localResult = `SMS sent to ${phoneNumberStr}: ${args.messageText}`;
                     } else {
                         localResult = `SMS sending cancelled by user.`;
                     }
@@ -75,44 +77,6 @@ export class HandleToolCall {
             }
 
 
-            //  if (toolCall.function.name === "background_color_control") {
-            //     const confirmed = await this.confirmAction(
-            //         "Background Color Change",
-            //         `Change background color to ${args.color}?`
-            //     );
-            //     if (confirmed) {
-            //         setBackgroundColor?.(args.color);
-            //         localResult = `Background color set to ${args.color}.`;
-            //     } else {
-            //         localResult = `Background color change cancelled by user.`;
-            //     }
-            // }
-            // else if (toolCall.function.name === "send_sms") {
-            //     const confirmed = await this.confirmAction(
-            //         "Send SMS",
-            //         `Send SMS to ${args.phoneNumber}?\n\nMessage: "${args.messageText}"`
-            //     );
-            //     if (confirmed) {
-            //         this.sendSMS(args.phoneNumber, args.messageText);
-            //         localResult = `SMS sent to ${args.phoneNumber}: ${args.messageText}`;
-            //     } else {
-            //         localResult = `SMS sending cancelled by user.`;
-            //     }
-            // }
-            // else if (toolCall.function.name === "read_contacts") {
-            //     const confirmed = await this.confirmAction(
-            //         "Access Contacts",
-            //         `Allow AI to read contacts${args.searchQuery ? ` matching "${args.searchQuery}"` : ''}?`
-            //     );
-            //     if (confirmed) {
-            //         const contacts = await NativeModules.contactsModule.getContacts(args.searchQuery);
-            //         console.log("Search Query:", args.searchQuery);
-            //         console.log("Contacts:", contacts);
-            //         localResult = contacts;
-            //     } else {
-            //         localResult = `Contact access denied by user.`;
-            //     }
-            //  }
             // Append the Observation
             toolResults.push({
                 role: "tool",
@@ -124,14 +88,6 @@ export class HandleToolCall {
     return toolResults;
 }
 
-// async getContacts (): Promise<string> {
-//     return new Promise((resolve) => {
-//         NativeModules.contactsModule.getContacts((searchQuery: string) => {
-//             console.log("Contacts:", contacts);
-//             resolve(contacts);
-//         });
-// });
-// }
 
 alertUser(message: string) {
     Alert.alert("Agent Alert", message, [{ text: "OK" }]);

@@ -49,8 +49,12 @@ const handleToolCall = new HandleToolCall();
         
         let aiMessage = data.choices[0].message;
 
-        // Step 2: Check for Tool Calls
-        if (aiMessage.tool_calls && aiMessage.tool_calls.length > 0) {
+        // Step 2: Loop to handle multiple rounds of tool calls
+        let maxIterations = 10; // Prevent infinite loops
+        let iteration = 0;
+        
+        while (aiMessage.tool_calls && aiMessage.tool_calls.length > 0 && iteration < maxIterations) {
+            iteration++;
             
             // Ensure content is a string (can be null when tool_calls present)
             if (!aiMessage.content) {
@@ -71,17 +75,16 @@ const handleToolCall = new HandleToolCall();
                 });
             }
 
-            // Step 3: Send the Observations back for the final response
-            let finalRawResponse = await fetchAgentResponse();
+            // Step 3: Send the Observations back for the next response
+            let nextRawResponse = await fetchAgentResponse();
+            let nextData = await nextRawResponse.json();
             
-            let finalData = await finalRawResponse.json();
-            
-            if (!finalData || !finalData.choices || !finalData.choices[0] || !finalData.choices[0].message) {
-                console.error("Invalid final response structure:", finalData);
+            if (!nextData || !nextData.choices || !nextData.choices[0] || !nextData.choices[0].message) {
+                console.error("Invalid response structure in loop:", nextData);
                 return "Received an invalid response from the server.";
             }
             
-            aiMessage = finalData.choices[0].message;
+            aiMessage = nextData.choices[0].message;
         }
 
         // Save and return final text
@@ -92,8 +95,11 @@ const handleToolCall = new HandleToolCall();
                 .replace(/<\|think\|>[\s\S]*?<\|\/think\|>/gi, '')
                 .replace(/\[THINK\][\s\S]*?\[\/THINK\]/gi, '')
                 .trim();
-            chatHistory.push({ role: "assistant", content: cleaned });
-            return cleaned;
+            
+            if (cleaned) {
+                chatHistory.push({ role: "assistant", content: cleaned });
+                return cleaned;
+            }
         }
         
         console.error("No content in AI message:", aiMessage);

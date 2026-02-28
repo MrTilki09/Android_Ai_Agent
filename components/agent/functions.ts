@@ -22,7 +22,7 @@ export const agentFunctions = [
                 parameters: {
                     type: "object",
                     properties: {
-                        phoneNumber: { type: "string", description: "The phone number to send the SMS to" },
+                        phoneNumber: { type: "string", description: "The phone number to send the SMS to, it must be a string" },
                         messageText: { type: "string", description: "The text message to send" }
                     },
                     required: ["phoneNumber", "messageText"]
