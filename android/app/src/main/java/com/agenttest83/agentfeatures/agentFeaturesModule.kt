@@ -11,6 +11,7 @@ import com.facebook.react.bridge.ReactMethod
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import com.facebook.react.bridge.Promise
 
 
 class agentFeaturesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -21,6 +22,21 @@ class agentFeaturesModule(reactContext: ReactApplicationContext) : ReactContextB
 
     override fun getName() = "agentFeatures"
 
+    @ReactMethod
+    fun openYouTube(promise: Promise) {
+        try {
+            val intent = reactApplicationContext.packageManager.getLaunchIntentForPackage("com.google.android.youtube")
+            if (intent != null) {
+                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                reactApplicationContext.startActivity(intent)
+                promise.resolve("YouTube Launched Successfully")
+            } else {
+                promise.reject("ERROR", "YouTube is not installed.")
+            }
+        } catch (e: Exception) {
+            promise.reject("ERROR", e.message)
+        }
+    }
 
     @ReactMethod
     fun scheduleNotification(title: String, message: String, delayInSeconds: Double) {

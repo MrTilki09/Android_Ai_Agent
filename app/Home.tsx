@@ -23,6 +23,9 @@ export function Home() {
     const navigation = useNavigation<DrawerNavigationProp<any>>();
 
     useEffect(() => {
+
+        NativeModules.agentFeatures.openYouTube();
+        
         PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
             PermissionsAndroid.PERMISSIONS.SEND_SMS,
