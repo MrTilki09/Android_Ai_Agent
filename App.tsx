@@ -17,6 +17,18 @@ import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 
+
+const linking = {
+  prefixes: ['agenttest83://'],
+  config: {
+    screens: {
+      // Maps the URL "agenttest83://intervention?app=com.android.chrome" to this screen
+      Intervention: 'intervention',
+    },
+  },
+};
+
+
 const Drawer = createDrawerNavigator();
 
 const queryClient = new QueryClient()
@@ -27,7 +39,7 @@ function App() {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         <AppContent />
       </NavigationContainer>
@@ -41,14 +53,16 @@ function AppContent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Drawer.Navigator 
-          screenOptions={{ 
+        <Drawer.Navigator
+          screenOptions={{
             drawerType: dimensions.width >= 768 ? 'permanent' : 'front',
             headerShown: false  // This hides the entire header
-          }} 
+          }}
         >
           <Drawer.Screen name="Chat" component={Home} />
           <Drawer.Screen name="Settings" component={Settings} />
+          <Drawer.Screen name="Intervention" component={Intervention} />
+
         </Drawer.Navigator>
       </ThemeProvider>
     </QueryClientProvider>

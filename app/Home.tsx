@@ -24,8 +24,15 @@ export function Home() {
 
     useEffect(() => {
 
-        NativeModules.agentFeatures.openYouTube();
-        
+        // NativeModules.agentFeatures.openYouTube();
+        const twinRules = {
+            "com.android.chrome": 0,  // Block instantly for testing
+            "com.instagram.android": 1, // 30 minutes allowed
+            "com.twitter.android": 15
+            };
+
+            // Send the rules to the Kotlin background service
+            NativeModules.TwinAgent.setAppLimits(twinRules);
         PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
             PermissionsAndroid.PERMISSIONS.SEND_SMS,

@@ -32,8 +32,8 @@ class YouTubeScraperService : AccessibilityService() {
             // If the text is already in the Set, it returns false and does nothing.
             // If it is brand new, it adds it, returns true, and fires the Log!
             if (scrapedTitles.add(visibleText)) {
-                Log.d("AGENT_DEBUG", "[$className] NEW TITLE: $visibleText")
-                Log.d("AGENT_DEBUG", "Total Unique Videos Scraped: ${scrapedTitles.size}")
+//                Log.d("AGENT_DEBUG", "[$className] NEW TITLE: $visibleText")
+//                Log.d("AGENT_DEBUG", "Total Unique Videos Scraped: ${scrapedTitles.size}")
             }
         }
 
