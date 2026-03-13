@@ -7,7 +7,7 @@ import { NativeModules } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import DrawerButton from "../components/buttons/DrawerButton";
-import RenderMessage from "../components/app/RenderMessage";
+import { RenderMessage } from "../components/app/RenderMessage";
 // const { agentFeatures } = NativeModules;  // matches getName() return value
 
 type Message = {
@@ -22,6 +22,18 @@ export function Home() {
     const { backgroundColor, setBackgroundColor } = useTheme();
     const navigation = useNavigation<DrawerNavigationProp<any>>();
 
+
+    const test = async () => {
+
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+        // Current time
+        const endOfSearch = now.getTime();
+        var result = await NativeModules.UsageStats.getAllUsageStats(startOfDay, endOfSearch);
+        console.log('usage report ',result);
+    }
+
     useEffect(() => {
 
         // NativeModules.agentFeatures.openYouTube();
@@ -29,10 +41,12 @@ export function Home() {
             "com.android.chrome": 0,  // Block instantly for testing
             "com.instagram.android": 1, // 30 minutes allowed
             "com.twitter.android": 15
-            };
+        };
 
-            // Send the rules to the Kotlin background service
-            NativeModules.TwinAgent.setAppLimits(twinRules);
+
+test();
+        // Send the rules to the Kotlin background service
+        NativeModules.TwinAgent.setAppLimits(twinRules);
         PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
             PermissionsAndroid.PERMISSIONS.SEND_SMS,
@@ -88,7 +102,7 @@ export function Home() {
         >
             {/* Header */}
             <View className="flex-row items-center border-b border-gray-700 bg-[#161b22] px-4 py-3 pt-10">
-               <DrawerButton />
+                <DrawerButton />
                 <View className="flex-1 items-center">
                     <Text className="text-base font-semibold text-white">AI Agent</Text>
                     <Text className="text-xs text-green-400">
@@ -105,7 +119,7 @@ export function Home() {
                 onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
             >
                 {messages.map((msg, i) => (
-                    <RenderMessage key={i} content={msg.content} role={msg.role} />
+                    <RenderMessage key={i} msg={msg} />
                 ))}
                 {mutation.status === "pending" && (
                     <View className="my-1 self-start rounded-2xl rounded-bl-sm bg-[#21262d] px-4 py-2">

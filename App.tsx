@@ -61,7 +61,6 @@ function AppContent() {
         >
           <Drawer.Screen name="Chat" component={Home} />
           <Drawer.Screen name="Settings" component={Settings} />
-          <Drawer.Screen name="Intervention" component={Intervention} />
 
         </Drawer.Navigator>
       </ThemeProvider>

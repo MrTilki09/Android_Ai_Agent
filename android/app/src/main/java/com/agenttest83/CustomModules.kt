@@ -9,6 +9,7 @@ import com.agenttest83.agentfeatures.agentFeaturesModule
 import com.agenttest83.sms.smsModule
 import com.agenttest83.contacts.contactsModule
 import com.agenttest83.TwinModule
+import com.agenttest83.digitaltwin.UsageStats
 
 class CustomModules : ReactPackage {
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
@@ -23,6 +24,7 @@ class CustomModules : ReactPackage {
         modules.add(smsModule(reactContext))
         modules.add(contactsModule(reactContext))
         modules.add(TwinModule(reactContext))
+        modules.add(UsageStats(reactContext))
         return modules
     }
 }

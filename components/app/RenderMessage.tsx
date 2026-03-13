@@ -1,14 +1,19 @@
 import { Text, View } from "react-native";
 
+type RenderMessageProps = {
+    msg: {
+        role: "user" | "assistant";
+        content: string;
+    };
+};
 
-export default function RenderMessage(msg: any, i: number) {
- const colorMatch = msg.content.match(/#[0-9A-Fa-f]{6}|#[0-9A-Fa-f]{3}\b|(?:red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey|cyan|magenta|lime|indigo|violet|navy|teal|olive|maroon|aqua|fuchsia|silver|gold)\b/i);
-                    const detectedColor = colorMatch ? colorMatch[0] : null;
+export function RenderMessage({ msg }: RenderMessageProps) {
+    const colorMatch = msg.content.match(/#[0-9A-Fa-f]{6}|#[0-9A-Fa-f]{3}\b|(?:red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey|cyan|magenta|lime|indigo|violet|navy|teal|olive|maroon|aqua|fuchsia|silver|gold)\b/i);
+    const detectedColor = colorMatch ? colorMatch[0] : null;
 
 
     return (
         <View
-            key={i}
             className={`my-1 max-w-[80%] rounded-2xl px-4 py-2 ${msg.role === "user"
                 ? "self-end rounded-br-sm bg-blue-600"
                 : "self-start rounded-bl-sm bg-[#21262d]"
