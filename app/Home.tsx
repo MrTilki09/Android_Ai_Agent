@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import DrawerButton from "../components/buttons/DrawerButton";
 import { RenderMessage } from "../components/app/RenderMessage";
+import { DigitalTwinLimitRules } from "../components/userFunctions";
 // const { agentFeatures } = NativeModules;  // matches getName() return value
 
 type Message = {
@@ -23,30 +24,14 @@ export function Home() {
     const navigation = useNavigation<DrawerNavigationProp<any>>();
 
 
-    const test = async () => {
-
-        const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-        // Current time
-        const endOfSearch = now.getTime();
-        var result = await NativeModules.UsageStats.getAllUsageStats(startOfDay, endOfSearch);
-        console.log('usage report ',result);
-    }
+   
 
     useEffect(() => {
 
         // NativeModules.agentFeatures.openYouTube();
-        const twinRules = {
-            "com.android.chrome": 0,  // Block instantly for testing
-            "com.instagram.android": 1, // 30 minutes allowed
-            "com.twitter.android": 15
-        };
+       DigitalTwinLimitRules();
 
-
-test();
         // Send the rules to the Kotlin background service
-        NativeModules.TwinAgent.setAppLimits(twinRules);
         PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
             PermissionsAndroid.PERMISSIONS.SEND_SMS,

@@ -42,5 +42,21 @@ export const agentFunctions = [
                     required: []
                 }
             }
-        }
+        },
+        {
+            type: "function",
+            function: {
+                name: "read_usage_stats",
+                description: "Read the user's usage statistics and return a list of app usage data for today.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        // startTime: { type: "double", description: "required start time to filter usage stats" },
+                        // endTime: { type: "double", description: "required end time to filter usage stats" }
+                    },
+                    required: []
+                }
+            }
+        },
+        
 ] 

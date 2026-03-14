@@ -7,7 +7,7 @@
 import "./global.css"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StatusBar, useColorScheme, useWindowDimensions, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Home } from "./app/Home";
 import Settings from "./app/Settings";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -16,6 +16,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
+import { Apps } from "./app/Apps";
 
 
 const linking = {
@@ -51,6 +52,7 @@ function AppContent() {
   const dimensions = useWindowDimensions();
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <Drawer.Navigator
@@ -61,10 +63,12 @@ function AppContent() {
         >
           <Drawer.Screen name="Chat" component={Home} />
           <Drawer.Screen name="Settings" component={Settings} />
+          <Drawer.Screen name="Apps" component={Apps} />
 
         </Drawer.Navigator>
       </ThemeProvider>
     </QueryClientProvider>
+    </SafeAreaView>
   );
 }
 

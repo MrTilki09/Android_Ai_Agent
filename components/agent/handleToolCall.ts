@@ -1,4 +1,5 @@
 import { Alert, NativeModules } from "react-native";
+import { FetchUsageStats } from "../userFunctions";
 
 
 export class HandleToolCall {
@@ -74,6 +75,15 @@ export class HandleToolCall {
                     } else {
                         localResult = `Contact access denied by user.`;
                     }
+                    break;
+                case "read_usage_stats":
+                
+                    const usageStats = await FetchUsageStats();
+                    console.log("Usage Stats:", usageStats);
+                    localResult = usageStats;
+                    
+                    break;
+                
             }
 
 
