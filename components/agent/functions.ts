@@ -58,5 +58,36 @@ export const agentFunctions = [
                 }
             }
         },
+        {
+            type: "function",
+            function: {
+                name: "post_twitter",
+                description: "Fill's a tweet on behalf of the user. The user will have the chance to edit and confirm before posting and has to click post",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        tweetContent: { type: "string", description: "The content of the tweet to post" }
+                    },
+                    required: ['tweetContent']
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "set_usage_limits",
+                description: "Set the usage limits for the Digital Twin service. This will update the limits stored in AsyncStorage and send the new limits to the native TwinAgent service. Available apps: Facebook (com.facebook.katana), Instagram (com.instagram.android), Snapchat (com.snapchat.android), Reddit (com.reddit.frontpage), Chrome (com.android.chrome), Twitter (com.twitter.android).",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        twinLimits: { 
+                            type: "object", 
+                            description: "The usage limits for each app in minutes. Example: {\"com.facebook.katana\": 30, \"com.instagram.android\": 20, \"com.snapchat.android\": 10, \"com.reddit.frontpage\": 25, \"com.android.chrome\": 0, \"com.twitter.android\": 0}" 
+                        }
+                    },
+                    required: ['twinLimits']
+                }
+            }
+        },
         
 ] 

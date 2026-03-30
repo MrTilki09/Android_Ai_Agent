@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Text, View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, PermissionsAndroid } from "react-native";
+import { Text, View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, PermissionsAndroid, Alert } from "react-native";
 import { startAgent } from "../components/agent";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import DrawerButton from "../components/buttons/DrawerButton";
 import { RenderMessage } from "../components/app/RenderMessage";
-import { DigitalTwinLimitRules } from "../components/userFunctions";
+import { DigitalTwinLimitRules, FetchUsageStats } from "../components/userFunctions";
 // const { agentFeatures } = NativeModules;  // matches getName() return value
 
 type Message = {
@@ -27,11 +27,41 @@ export function Home() {
    
 
     useEffect(() => {
+        const initializeApp = async () => {
+            // Initialize Twin Limits
+            await DigitalTwinLimitRules();
+console.log('App component rendered, fetched usage stats', await FetchUsageStats());
 
-        // NativeModules.agentFeatures.openYouTube();
-       DigitalTwinLimitRules();
+            // Check if accessibility service is enabled
+            try {
+                const isEnabled = await NativeModules.TwinAgent.isAccessibilityServiceEnabled();
+                console.log("Accessibility Service Enabled:", !isEnabled && Platform.OS === "android");
+                if (!isEnabled && Platform.OS === "android") {
+                    Alert.alert(
+                        "Enable Accessibility Service",
+                        "The Digital Twin service needs accessibility permissions to monitor app usage. Please enable it in Settings.",
+                        [
+                            {
+                                text: "Cancel",
+                                onPress: () => console.log("User declined"),
+                                style: "cancel",
+                            },
+                            {
+                                text: "Open Settings",
+                                onPress: () => NativeModules.TwinAgent.openAccessibilitySettings(),
+                            },
+                        ],
+                        { cancelable: false }
+                    );
+                }
+            } catch (error) {
+                console.error("Error checking accessibility service:", error);
+            }
+        };
 
-        // Send the rules to the Kotlin background service
+        initializeApp();
+
+        // Request permissions
         PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
             PermissionsAndroid.PERMISSIONS.SEND_SMS,

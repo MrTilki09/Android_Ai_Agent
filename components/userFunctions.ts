@@ -15,6 +15,7 @@ export const FetchUsageStats = async () => {
 
 
 export function formatUsageTime(milliseconds: number): string {
+    
     if (!Number.isFinite(milliseconds) || milliseconds <= 0) {
         return "0m";
     }
@@ -36,16 +37,28 @@ export function formatUsageTime(milliseconds: number): string {
 }
 
 export async function DigitalTwinLimitRules() {
+
+
     const twinRules = {
         "com.facebook.katana": 30,
         "com.instagram.android": 20,
         "com.snapchat.android": 10,
         "com.reddit.frontpage": 25,
-        "com.twitter.android": 15
+        "com.android.chrome": 0,
+        "com.twitter.android": 0
     };
 
     const storage = await createAsyncStorage("appDB");
     await storage.setItem("twinRules", JSON.stringify(twinRules));
-
+    console.log("Digital Twin Limit Rules set:", twinRules);
+    
+    // Send the limits to the native Kotlin module
+    try {
+        await NativeModules.TwinAgent.setAppLimits(twinRules);
+        console.log("App limits sent to TwinAgent service");
+    } catch (error) {
+        console.error("Error setting app limits in TwinAgent:", error);
+    }
+    
     return twinRules;
 }

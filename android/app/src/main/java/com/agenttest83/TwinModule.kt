@@ -1,6 +1,9 @@
 package com.agenttest83 // Use your actual package name
 
 import com.facebook.react.bridge.*
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 
 class TwinModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -21,5 +24,35 @@ class TwinModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMo
 
         // Save it to the static variable in our AccessibilityService
         DigitalTwinService.appLimits = newLimits
+    }
+
+    @ReactMethod
+    fun isAccessibilityServiceEnabled(promise: Promise) {
+        try {
+            val context = reactApplicationContext
+            
+            // Get the enabled services string
+            val enabledServices = Settings.Secure.getString(
+                context.contentResolver,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            ) ?: ""
+
+            // Check if our DigitalTwinService is in the enabled services
+            val isServiceEnabled = enabledServices.contains("com.agenttest83/.DigitalTwinService")
+            promise.resolve(isServiceEnabled)
+        } catch (e: Exception) {
+            promise.reject("ERROR", "Failed to check accessibility service", e)
+        }
+    }
+
+    @ReactMethod
+    fun openAccessibilitySettings() {
+        try {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            reactApplicationContext.startActivity(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

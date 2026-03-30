@@ -1,5 +1,6 @@
 import { Alert, NativeModules } from "react-native";
 import { FetchUsageStats } from "../userFunctions";
+import { createAsyncStorage } from "@react-native-async-storage/async-storage";
 
 
 export class HandleToolCall {
@@ -77,13 +78,49 @@ export class HandleToolCall {
                     }
                     break;
                 case "read_usage_stats":
-                
+                 
+                    const usageConfirmed = await NativeModules.UsageStats.hasUsagePermission();
+                    if(!usageConfirmed){
+                        Alert.alert(
+                        "Enable Usage Permission",
+                        "The Digital Twin service needs usage permissions to monitor app usage. Please enable it in Settings.",
+                        [
+                            {
+                                text: "Cancel",
+                                onPress: () => console.log("User declined"),
+                                style: "cancel",
+                            },
+                            {
+                                text: "Open Settings",
+                                onPress: () => {NativeModules.UsageStats.openUsageSettings()},
+                            },
+                        ],
+                        { cancelable: false }
+                    );
+                    }
+
                     const usageStats = await FetchUsageStats();
                     console.log("Usage Stats:", usageStats);
                     localResult = usageStats;
                     
                     break;
-                
+                case "post_twitter":
+                    const tweetContent = args.tweetContent;
+                    NativeModules.agentFeatures.openTwitterComposer(
+                        tweetContent
+                    );
+                    break;
+                case "set_usage_limits":
+                    try{
+                        this.setUsageLimits(args.twinLimits);
+                        localResult = `Usage limits updated: ${JSON.stringify(args.twinLimits)}`;
+                    }
+                    catch(error : Error | any){
+                        console.error("Error setting usage stats:", error);
+                        localResult = `Error setting usage limits: ${error.message}`;
+                    }
+                    break;
+
             }
 
 
@@ -98,6 +135,30 @@ export class HandleToolCall {
     return toolResults;
 }
 
+async setUsageLimits(twinLimits: object) {
+    
+        const storage = await createAsyncStorage("appDB");
+        const existingRules = await storage.getItem("twinRules").then((rules) => {
+            return rules ? JSON.parse(rules) : {};
+        });
+
+        // Merge: existingRules first, then override with twinLimits
+        // This ensures twinLimits takes precedence for any matching keys
+        const twinRules = { ...existingRules, ...twinLimits };
+
+        await storage.setItem("twinRules", JSON.stringify(twinRules));
+        console.log("Digital Twin Limit Rules set:", twinRules);
+        
+        // Send the limits to the native Kotlin module
+        try {
+            await NativeModules.TwinAgent.setAppLimits(twinRules);
+            console.log("App limits sent to TwinAgent service");
+        } catch (error) {
+            console.error("Error setting app limits in TwinAgent:", error);
+        }
+        
+        return twinRules;
+}
 
 alertUser(message: string) {
     Alert.alert("Agent Alert", message, [{ text: "OK" }]);

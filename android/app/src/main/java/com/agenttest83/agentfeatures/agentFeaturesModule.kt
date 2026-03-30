@@ -10,8 +10,14 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.Intent
 import com.facebook.react.bridge.Promise
+import android.content.Intent
+import android.net.Uri
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.Toast
+// If you use the URI fallback (recommended)
+import java.net.URLEncoder
 
 
 class agentFeaturesModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -21,6 +27,61 @@ class agentFeaturesModule(reactContext: ReactApplicationContext) : ReactContextB
     }
 
     override fun getName() = "agentFeatures"
+
+
+
+
+//    @ReactMethod
+//    fun sendWhatsAppAutomation(phoneNumber: String, message: String) {
+//        val context = reactApplicationContext
+//        try {
+//            val url = "https://api.whatsapp.com/send?phone=$phoneNumber&text=${Uri.encode(message + " [DT]")}"
+//            val intent = Intent(Intent.ACTION_VIEW).apply {
+//                data = Uri.parse(url)
+//                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Required for non-activity context
+//                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // Forces the app to front
+//            }
+//
+//            // Final check before launch
+//            if (intent.resolveActivity(context.packageManager) != null) {
+//                context.startActivity(intent)
+//            } else {
+//                // If the app check fails, launch via Browser as last resort
+//                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+//                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//                context.startActivity(webIntent)
+//            }
+//        } catch (e: Exception) {
+//            android.util.Log.e("AgentFeatures", "CRASH: ${e.message}")
+//        }
+//    }
+
+    @ReactMethod
+    fun openTwitterComposer(message: String) {
+        try {
+            // We use ACTION_VIEW with a twitter:// URI scheme.
+            // This is often more reliable for opening the app's internal composer directly.
+            val tweetUrl = "twitter://post?message=${Uri.encode(message)}"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tweetUrl))
+
+            // This flag is MANDATORY when starting an activity from a non-activity context
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+            // Check if the X app can handle this specific URI
+            if (intent.resolveActivity(reactApplicationContext.packageManager) != null) {
+                reactApplicationContext.startActivity(intent)
+            } else {
+                // Fallback to the web-based intent if the app isn't found or fails
+                val webUrl = "https://twitter.com/intent/tweet?text=${Uri.encode(message)}"
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(webUrl))
+                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                reactApplicationContext.startActivity(webIntent)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("AgentFeatures", "Twitter failed: ${e.message}")
+        }
+    }
+
 
     @ReactMethod
     fun openYouTube(promise: Promise) {

@@ -8,6 +8,13 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.util.Base64
 import java.io.ByteArrayOutputStream
+
+
+import android.content.Intent
+import android.provider.Settings
+import android.app.AppOpsManager
+import android.os.Process
+
 // Rename to UsageStats to avoid conflicts
 class UsageStats(val context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
 
@@ -64,6 +71,18 @@ class UsageStats(val context: ReactApplicationContext) : ReactContextBaseJavaMod
         }
     }
 
+
+    @ReactMethod
+    fun openUsageSettings(promise: Promise) {
+        try {
+            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            promise.resolve("Opened usage settings")
+        } catch (e: Exception) {
+            promise.reject("ERROR", "Failed to open usage settings", e)
+        }
+    }
 
     @ReactMethod
     fun hasUsagePermission(promise: Promise) {

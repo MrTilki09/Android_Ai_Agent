@@ -1,15 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
 import "./global.css"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StatusBar, useColorScheme, useWindowDimensions, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Home } from "./app/Home";
 import Settings from "./app/Settings";
+import Intervention from "./app/Intervention";
 import { ThemeProvider } from "./context/ThemeContext";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from "@react-navigation/native";
@@ -23,8 +18,11 @@ const linking = {
   prefixes: ['agenttest83://'],
   config: {
     screens: {
-      // Maps the URL "agenttest83://intervention?app=com.android.chrome" to this screen
+      // Maps the URL "agenttest83://intervention?app=com.android.chrome" to Intervention screen
       Intervention: 'intervention',
+      Chat: 'chat',
+      Settings: 'settings',
+      Apps: 'apps',
     },
   },
 };
@@ -37,10 +35,11 @@ const queryClient = new QueryClient()
 function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
+  
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer linking={linking}>
+      <NavigationContainer linking={linking} fallback={<View />}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         <AppContent />
       </NavigationContainer>
@@ -64,7 +63,13 @@ function AppContent() {
           <Drawer.Screen name="Chat" component={Home} />
           <Drawer.Screen name="Settings" component={Settings} />
           <Drawer.Screen name="Apps" component={Apps} />
-
+          <Drawer.Screen 
+            name="Intervention" 
+            component={Intervention}
+            options={{
+              drawerItemStyle: { display: 'none' } // Hide from drawer menu
+            }}
+          />
         </Drawer.Navigator>
       </ThemeProvider>
     </QueryClientProvider>

@@ -2,11 +2,16 @@
 import { HandleToolCall } from './handleToolCall';
 import OpenAI from 'openai';
 import { agentFunctions } from './functions';
-import { NativeModules } from 'react-native';
-const LM_STUDIO_URL = 'http://192.168.1.43:1234/v1/chat/completions';
+import { NativeModules, Platform } from 'react-native';
+
+// For Android emulator use 10.0.2.2, for physical device use your machine's IP
+// Change this to your machine IP if using physical device (e.g., '192.168.x.x')
+const LOCAL_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+const LOCAL_PORT = '1234';
+const LM_STUDIO_URL = `http://${LOCAL_HOST}:${LOCAL_PORT}/v1/chat/completions`;
 
 const openai = new OpenAI({
-    baseURL: 'http://192.168.1.43:1234/v1',
+    baseURL: `http://${LOCAL_HOST}:${LOCAL_PORT}/v1`,
     apiKey: 'lm-studio'
 });
 
@@ -111,7 +116,7 @@ const fetchAgentResponse = async (): Promise<any> => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            model: "local-model",
+            model: "qwen3.5-2b",
             messages: chatHistory,
             tools: tools
         })
