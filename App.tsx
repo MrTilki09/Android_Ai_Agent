@@ -12,6 +12,7 @@ import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Apps } from "./app/Apps";
+import { Chat } from "./app/Chat";
 
 
 const linking = {
@@ -60,7 +61,8 @@ function AppContent() {
             headerShown: false  // This hides the entire header
           }}
         >
-          <Drawer.Screen name="Chat" component={Home} />
+          <Drawer.Screen name="Home" component={Home} />
+          <Drawer.Screen name="Chat" component={Chat} />
           <Drawer.Screen name="Settings" component={Settings} />
           <Drawer.Screen name="Apps" component={Apps} />
           <Drawer.Screen 

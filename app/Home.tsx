@@ -1,172 +1,29 @@
-import { useMutation } from "@tanstack/react-query";
-import { Text, View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, PermissionsAndroid, Alert } from "react-native";
-import { startAgent } from "../components/agent";
-import { useEffect, useRef, useState } from "react";
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../context/ThemeContext";
-import { NativeModules } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-import { DrawerNavigationProp } from "@react-navigation/drawer";
 import DrawerButton from "../components/buttons/DrawerButton";
-import { RenderMessage } from "../components/app/RenderMessage";
-import { DigitalTwinLimitRules, FetchUsageStats } from "../components/userFunctions";
-// const { agentFeatures } = NativeModules;  // matches getName() return value
-
-type Message = {
-    role: "user" | "assistant";
-    content: string;
-};
 
 export function Home() {
-    const [prompt, setPrompt] = useState<string>("");
-    const [messages, setMessages] = useState<Message[]>([]);
-    const scrollRef = useRef<ScrollView>(null);
-    const { backgroundColor, setBackgroundColor } = useTheme();
-    const navigation = useNavigation<DrawerNavigationProp<any>>();
-
-
-   
-
-    useEffect(() => {
-        const initializeApp = async () => {
-            // Initialize Twin Limits
-            await DigitalTwinLimitRules();
-console.log('App component rendered, fetched usage stats', await FetchUsageStats());
-
-            // Check if accessibility service is enabled
-            try {
-                const isEnabled = await NativeModules.TwinAgent.isAccessibilityServiceEnabled();
-                console.log("Accessibility Service Enabled:", !isEnabled && Platform.OS === "android");
-                if (!isEnabled && Platform.OS === "android") {
-                    Alert.alert(
-                        "Enable Accessibility Service",
-                        "The Digital Twin service needs accessibility permissions to monitor app usage. Please enable it in Settings.",
-                        [
-                            {
-                                text: "Cancel",
-                                onPress: () => console.log("User declined"),
-                                style: "cancel",
-                            },
-                            {
-                                text: "Open Settings",
-                                onPress: () => NativeModules.TwinAgent.openAccessibilitySettings(),
-                            },
-                        ],
-                        { cancelable: false }
-                    );
-                }
-            } catch (error) {
-                console.error("Error checking accessibility service:", error);
-            }
-        };
-
-        initializeApp();
-
-        // Request permissions
-        PermissionsAndroid.requestMultiple([
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-            PermissionsAndroid.PERMISSIONS.SEND_SMS,
-            'android.permission.INTERNET' as any,
-            'android.permission.SCHEDULE_EXACT_ALARM' as any,
-            'android.permission.USE_EXACT_ALARM' as any,
-            'android.permission.READ_CONTACTS' as any,
-        ])
-            .then((results) => {
-                const allGranted = Object.values(results).every(
-                    (result) => result === PermissionsAndroid.RESULTS.GRANTED
-                );
-                if (allGranted) {
-                    const { agentFeatures } = NativeModules;
-                    console.log('module:', agentFeatures);
-                    agentFeatures.scheduleNotification("Scheduled!", "This was delayed", 10);
-                    console.log(JSON.stringify(NativeModules.agentFeatures));
-                } else {
-                    console.log("Some permissions denied:", results);
-                }
-            })
-            .catch((error) => {
-                console.error("Error requesting permissions:", error);
-            });
-    }, []);
-
-    // agentFeatures.sendCoolNotification("Agent Module Loaded", "The agent is ready to receive commands.");
-    const mutation = useMutation({
-        mutationFn: (message: string) => startAgent(message, setBackgroundColor),
-        onSuccess: (data) => {
-            setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: data ?? "..." },
-            ]);
-        },
-    });
-
-    function handleSend() {
-        if (!prompt.trim()) return;
-        setMessages((prev) => [...prev, { role: "user", content: prompt }]);
-        mutation.mutate(prompt);
-        setPrompt("");
-    }
-
+    const { backgroundColor } = useTheme();
+    const navigation = useNavigation();
+    
     return (
-        <KeyboardAvoidingView
-            style={{
-                backgroundColor: backgroundColor,
-            }}
-            className="flex-1 "
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-        >
-            {/* Header */}
-            <View className="flex-row items-center border-b border-gray-700 bg-[#161b22] px-4 py-3 pt-10">
-                <DrawerButton />
-                <View className="flex-1 items-center">
-                    <Text className="text-base font-semibold text-white">AI Agent</Text>
-                    <Text className="text-xs text-green-400">
-                        {mutation.status === "pending" ? "typing..." : "online"}
-                    </Text>
+        <>
+            <View style={{ flex: 1, backgroundColor, justifyContent: "center", alignItems: "center" }}>
+                <View className="flex-row items-start justify-start self-start ml-4 mt-16">
+                    <DrawerButton />
+                    
                 </View>
-                <View style={{ width: 24 }} />
-            </View>
-
-            {/* Messages */}
-            <ScrollView
-                ref={scrollRef}
-                className="flex-1 px-3 py-2"
-                onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
-            >
-                {messages.map((msg, i) => (
-                    <RenderMessage key={i} msg={msg} />
-                ))}
-                {mutation.status === "pending" && (
-                    <View className="my-1 self-start rounded-2xl rounded-bl-sm bg-[#21262d] px-4 py-2">
-                        <Text className="text-gray-400">●●●</Text>
+                <View>
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                        <Text className="text-2xl text-white">Welcome to the AI Agent App!</Text>
+                        <Text className="mt-4 text-gray-400">Go to the Chat to Start</Text>
+                        <TouchableOpacity className="mt-12 bg-gray-400 px-16 py-4 rounded-3xl" onPress={() => navigation.navigate("Chat")}>
+                            <Text className="text-lg text-white">Go to Chat</Text>
+                        </TouchableOpacity>
                     </View>
-                )}
-                <View
-                    style={{ paddingBottom: 100 }}
-
-                ></View>
-
-            </ScrollView>
-
-            {/* Input Bar */}
-            <View className="flex-row items-end border-t border-gray-700 bg-[#161b22] px-3 py-2">
-                <TextInput
-                    className="mr-2 flex-1 rounded-2xl bg-[#21262d] px-4 py-2 text-white"
-                    placeholder="Message..."
-                    placeholderTextColor="#6b7280"
-                    value={prompt}
-                    onChangeText={setPrompt}
-                    onSubmitEditing={handleSend}
-                    multiline
-                />
-                <TouchableOpacity
-                    className="h-10 w-10 items-center justify-center rounded-full bg-blue-600"
-                    onPress={handleSend}
-                    disabled={mutation.status === "pending"}
-                >
-                    <Text className="text-white">↑</Text>
-                </TouchableOpacity>
+                </View>
             </View>
-        </KeyboardAvoidingView>
+        </>
     );
 }

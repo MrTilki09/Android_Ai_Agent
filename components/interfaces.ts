@@ -5,4 +5,5 @@ export interface UsageStats{
     packageName: string;
     icon: string;
     totalTime: number;
+    limit: number;
 }
