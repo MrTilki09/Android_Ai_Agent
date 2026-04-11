@@ -12,7 +12,6 @@ export function Home() {
             <View style={{ flex: 1, backgroundColor, justifyContent: "center", alignItems: "center" }}>
                 <View className="flex-row items-start justify-start self-start ml-4 mt-16">
                     <DrawerButton />
-                    
                 </View>
                 <View>
                     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

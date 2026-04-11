@@ -1,5 +1,6 @@
 import { createAsyncStorage } from "@react-native-async-storage/async-storage";
 import { NativeModules } from "react-native";
+import { UsageLimit } from "./interfaces";
 
 
 export const FetchUsageStats = async () => {
@@ -63,4 +64,16 @@ export async function DigitalTwinLimitRules() {
     return twinRules;
 }
 
-
+export async function GetDigitalTwinLimitRules(): Promise<UsageLimit[]> {
+    const storage = await createAsyncStorage("appDB");
+    const rules = await storage.getItem("twinRules").then((rules) => {
+        if (!rules) return [];
+        const parsed = JSON.parse(rules);
+        return Object.entries(parsed).map(([packageName, limit]) => ({
+            packageName,
+            limit: limit as number
+        }));
+    });
+    console.log("Retrieved Digital Twin Limit Rules from Storage:", rules);
+    return rules;
+} 

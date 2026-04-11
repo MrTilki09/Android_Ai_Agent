@@ -7,3 +7,8 @@ export interface UsageStats{
     totalTime: number;
     limit: number;
 }
+
+export interface UsageLimit {
+    packageName: string;
+    limit: number;
+}
