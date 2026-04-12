@@ -106,8 +106,7 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
         return "The AI did not return any content.";
 
     } catch (error) {
-        console.error("Local Agent crashed:", error);
-        return "My local server hit an error. Make sure LM Studio is running and accessible!";
+        return "My local server hit an error. Check your connection and try again.f";
     }
 }
 

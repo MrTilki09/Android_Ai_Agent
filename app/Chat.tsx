@@ -1,15 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { Text, View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, PermissionsAndroid, Alert } from "react-native";
 import { startAgent } from "../components/agent";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
-import { NativeModules } from 'react-native';
-import { useNavigation } from "@react-navigation/native";
-import { DrawerNavigationProp } from "@react-navigation/drawer";
 import DrawerButton from "../components/buttons/DrawerButton";
 import { RenderMessage } from "../components/app/RenderMessage";
-import { DigitalTwinLimitRules, FetchUsageStats } from "../components/userFunctions";
-// const { agentFeatures } = NativeModules;  // matches getName() return value
 
 type Message = {
     role: "user" | "assistant";
@@ -21,72 +16,9 @@ export function Chat() {
     const [messages, setMessages] = useState<Message[]>([]);
     const scrollRef = useRef<ScrollView>(null);
     const { backgroundColor, setBackgroundColor } = useTheme();
-    const navigation = useNavigation<DrawerNavigationProp<any>>();
 
 
    
-
-    useEffect(() => {
-        const initializeApp = async () => {
-            // Initialize Twin Limits
-            await DigitalTwinLimitRules();
-console.log('App component rendered, fetched usage stats', await FetchUsageStats());
-
-            // Check if accessibility service is enabled
-            try {
-                const isEnabled = await NativeModules.TwinAgent.isAccessibilityServiceEnabled();
-                console.log("Accessibility Service Enabled:", !isEnabled && Platform.OS === "android");
-                if (!isEnabled && Platform.OS === "android") {
-                    Alert.alert(
-                        "Enable Accessibility Service",
-                        "The Digital Twin service needs accessibility permissions to monitor app usage. Please enable it in Settings.",
-                        [
-                            {
-                                text: "Cancel",
-                                onPress: () => console.log("User declined"),
-                                style: "cancel",
-                            },
-                            {
-                                text: "Open Settings",
-                                onPress: () => NativeModules.TwinAgent.openAccessibilitySettings(),
-                            },
-                        ],
-                        { cancelable: false }
-                    );
-                }
-            } catch (error) {
-                console.error("Error checking accessibility service:", error);
-            }
-        };
-
-        initializeApp();
-
-        // Request permissions
-        PermissionsAndroid.requestMultiple([
-            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-            PermissionsAndroid.PERMISSIONS.SEND_SMS,
-            'android.permission.INTERNET' as any,
-            'android.permission.SCHEDULE_EXACT_ALARM' as any,
-            'android.permission.USE_EXACT_ALARM' as any,
-            'android.permission.READ_CONTACTS' as any,
-        ])
-            .then((results) => {
-                const allGranted = Object.values(results).every(
-                    (result) => result === PermissionsAndroid.RESULTS.GRANTED
-                );
-                if (allGranted) {
-                    const { agentFeatures } = NativeModules;
-                    console.log('module:', agentFeatures);
-                    agentFeatures.scheduleNotification("Scheduled!", "This was delayed", 10);
-                    console.log(JSON.stringify(NativeModules.agentFeatures));
-                } else {
-                    console.log("Some permissions denied:", results);
-                }
-            })
-            .catch((error) => {
-                console.error("Error requesting permissions:", error);
-            });
-    }, []);
 
     // agentFeatures.sendCoolNotification("Agent Module Loaded", "The agent is ready to receive commands.");
     const mutation = useMutation({

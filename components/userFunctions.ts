@@ -51,7 +51,7 @@ export async function DigitalTwinLimitRules() {
 
     const storage = await createAsyncStorage("appDB");
     await storage.setItem("twinRules", JSON.stringify(twinRules));
-    console.log("Digital Twin Limit Rules set:", twinRules);
+    // console.log("Digital Twin Limit Rules set:", twinRules);
     
     // Send the limits to the native Kotlin module
     try {
@@ -63,6 +63,7 @@ export async function DigitalTwinLimitRules() {
     
     return twinRules;
 }
+
 
 export async function GetDigitalTwinLimitRules(): Promise<UsageLimit[]> {
     const storage = await createAsyncStorage("appDB");

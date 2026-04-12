@@ -4,11 +4,26 @@ import { useTheme } from "../context/ThemeContext";
 import { useEffect, useState } from "react";
 import { DigitalTwinLimitRules, GetDigitalTwinLimitRules } from "../components/userFunctions";
 import DigitalTwinLimitsViewModal from "../components/modals/DigitalTwinLimitsViewModal";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 export default function Settings() {
     const { backgroundColor } = useTheme();
 
-   const [showLimitsModal, setShowLimitsModal] = useState(false);
+    const [showLimitsModal, setShowLimitsModal] = useState(false);
+    const translateY = useSharedValue(100);
+    const opacity = useSharedValue(0);
+
+    useEffect(() => {
+        translateY.value = withTiming(0, { duration: 300 });
+        opacity.value = withTiming(1, { duration: 300 });
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: translateY.value }],
+        opacity: opacity.value,
+    }));
+
+
 
 
     return (
@@ -22,18 +37,20 @@ export default function Settings() {
                 <DrawerButton />
             </View>
 
+            <View className="mt-4 mb-4 bg-gray-400 h-1" />
 
-                    {/* Main Page */}
+            {/* Main Page */}
             <View>
                 <Text className="text-2xl text-white text-center mt-4">Settings</Text>
             </View>
 
-                {/* Body  */}
-            <View>
-                <Pressable className="mt-12 bg-gray-400 px-16 py-4 rounded-3xl self-center" onPress={() => setShowLimitsModal(true)}>
-                    <Text className="text-lg text-white">Digital Twin Limits</Text>
+            
+            {/* Body  */}
+            <Animated.View className="mt-4" style={animatedStyle}>
+                <Pressable className="mt-12 bg-gray-400  w-full py-4 rounded-lg self-center" onPress={() => setShowLimitsModal(true)}>
+                    <Text className="text-lg text-white text-center">Digital Twin Limits</Text>
                 </Pressable>
-            </View>
+            </Animated.View>
         </View>
     );
 }
