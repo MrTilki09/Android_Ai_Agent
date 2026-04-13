@@ -3,6 +3,7 @@ import { HandleToolCall } from './handleToolCall';
 import OpenAI from 'openai';
 import { agentFunctions } from './functions';
 import { NativeModules, Platform } from 'react-native';
+import { addMemoryToDB, allMemoryFromDB } from '../../src/db/client';
 
 // For Android emulator use 10.0.2.2, for physical device use your machine's IP
 // Change this to your machine IP if using physical device (e.g., '192.168.x.x')
@@ -19,16 +20,17 @@ const tools: OpenAI.Chat.ChatCompletionTool[] = agentFunctions as OpenAI.Chat.Ch
 
 
 
-let chatHistory: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    { role: "system", content: "You are a helpful assistant running locally on LM Studio. Use your tools when needed." }
-];
+// let chatHistory: OpenAI.Chat.ChatCompletionMessageParam[] = [
+//     { role: "system", content: "You are a helpful assistant running locally on LM Studio. Use your tools when needed." }
+// ];
 
 
 export async function startAgent(userMessage: string, setBackgroundColor?: (color: string) => void) {
 
     const handleToolCall = new HandleToolCall();
 
-    chatHistory.push({ role: "user", content: userMessage });
+    // chatHistory.push({ role: "user", content: userMessage });
+        await addMemoryToDB("user", userMessage);
 
     try {
         let rawResponse = await fetch(LM_STUDIO_URL, {
@@ -36,7 +38,7 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: "qwen3.5-2b",
-                messages: chatHistory,
+                messages: await allMemoryFromDB(), // Get chat history from DB
                 tools: tools
             })
         });
@@ -60,17 +62,19 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
                 aiMessage.content = "";
             }
 
-            chatHistory.push(aiMessage);
+            // chatHistory.push(aiMessage);
+            await addMemoryToDB("assistant", aiMessage.content);
 
             console.log(`[Agent] Iteration ${iteration}: Processing ${aiMessage.tool_calls.length} tool call(s)`);
             const toolResults = await handleToolCall.handle(aiMessage, setBackgroundColor);
 
             for (const result of toolResults) {
-                chatHistory.push({
-                    role: "tool",
-                    tool_call_id: result.tool_call_id,
-                    content: typeof result.content === 'string' ? result.content : JSON.stringify(result.content)
-                });
+                // chatHistory.push({
+                //     role: "tool",
+                //     tool_call_id: result.tool_call_id,
+                //     content: typeof result.content === 'string' ? result.content : JSON.stringify(result.content)
+                // });
+                await addMemoryToDB("tool", typeof result.content === 'string' ? result.content : JSON.stringify(result.content));
             }
 
             let nextRawResponse = await fetchAgentResponse();
@@ -96,13 +100,14 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
                 .trim();
 
             if (cleaned) {
-                chatHistory.push({ role: "assistant", content: cleaned });
+                    // chatHistory.push({ role: "assistant", content: cleaned });
+                    await addMemoryToDB("assistant", cleaned);
                 return cleaned;
             }
         }
 
         console.error("No content in AI message:", aiMessage);
-        console.error("Chat history length:", chatHistory.length);
+        // console.error("Chat history length:", chatHistory.length);
         return "The AI did not return any content.";
 
     } catch (error) {
@@ -116,7 +121,7 @@ const fetchAgentResponse = async (): Promise<any> => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             model: "qwen3.5-2b",
-            messages: chatHistory,
+            messages: await allMemoryFromDB(),
             tools: tools
         })
     });

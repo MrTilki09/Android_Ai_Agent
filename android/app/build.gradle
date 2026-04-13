@@ -105,6 +105,13 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    packagingOptions {
+        jniLibs {
+            pickFirsts += ['lib/x86/libc++_shared.so', 'lib/x86_64/libc++_shared.so', 'lib/armeabi-v7a/libc++_shared.so', 'lib/arm64-v8a/libc++_shared.so']
+        }
+    }
+
+    // Ensure native libraries are properly packaged
 }
 
 dependencies {
@@ -116,6 +123,9 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    
+    // Explicitly require op-sqlite with native binaries
+    // implementation("com.op-engineering:op-sqlite:15.2.10")
 }
 
 repositories {

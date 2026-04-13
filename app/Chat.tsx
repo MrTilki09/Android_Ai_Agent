@@ -1,10 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { Text, View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, PermissionsAndroid, Alert } from "react-native";
 import { startAgent } from "../components/agent";
-import {  useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import DrawerButton from "../components/buttons/DrawerButton";
 import { RenderMessage } from "../components/app/RenderMessage";
+import { allMemoryFromDB } from "../src/db/client";
 
 type Message = {
     role: "user" | "assistant";
@@ -17,7 +18,14 @@ export function Chat() {
     const scrollRef = useRef<ScrollView>(null);
     const { backgroundColor, setBackgroundColor } = useTheme();
 
+    useEffect(() => {
+        const initializeChat = async () => {
+            const dbMessages = await allMemoryFromDB();
+            setMessages(dbMessages.map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })));
+        };
 
+initializeChat();
+    }, []);
    
 
     // agentFeatures.sendCoolNotification("Agent Module Loaded", "The agent is ready to receive commands.");

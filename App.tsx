@@ -1,6 +1,6 @@
 import "./global.css"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { StatusBar, useColorScheme, useWindowDimensions, View } from 'react-native';
+import { StatusBar, Text, useColorScheme, useWindowDimensions, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Home } from "./app/Home";
 import Settings from "./app/Settings";
@@ -13,7 +13,10 @@ import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Apps } from "./app/Apps";
 import { Chat } from "./app/Chat";
-
+import { useEffect } from 'react';
+import { useMigrations } from "drizzle-orm/op-sqlite/migrator";
+import { addDemoData, clearMemory, db, testDatabase } from "./src/db/client";
+import migrations from './drizzle/migrations';
 
 const linking = {
   prefixes: ['agenttest83://'],
@@ -50,7 +53,26 @@ function App() {
 
 function AppContent() {
   const dimensions = useWindowDimensions();
+  
+  // useEffect(() => {
+  //   // Test the database connection on app start
+  //   // const testDbConnection = async () => {
+  //   //   clearMemory();
+  //   //   testDatabase();
+  //   // };
 
+  //   testDbConnection();
+  // }, []);
+  // Initialize database once React is ready
+const { success, error } = useMigrations(db, migrations);
+
+  if (error) {
+    return <Text>Migration Error: {error.message}</Text>;
+  }
+
+  if (!success) {
+    return <Text>Loading Migrations...</Text>;
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
     <QueryClientProvider client={queryClient}>

@@ -21,7 +21,6 @@ useEffect(() => {
 
         initializeApp();
 
-        // Request permissions
        
     }, []);
 
