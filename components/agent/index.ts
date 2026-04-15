@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import { agentFunctions } from './functions';
 import { NativeModules, Platform } from 'react-native';
 import { addMemoryToDB, allMemoryFromDB } from '../../src/db/client';
+import { createAsyncStorage } from '@react-native-async-storage/async-storage';
 
 // For Android emulator use 10.0.2.2, for physical device use your machine's IP
 // Change this to your machine IP if using physical device (e.g., '192.168.x.x')
@@ -24,12 +25,14 @@ const tools: OpenAI.Chat.ChatCompletionTool[] = agentFunctions as OpenAI.Chat.Ch
 export async function startAgent(userMessage: string, setBackgroundColor?: (color: string) => void) {
 
     const handleToolCall = new HandleToolCall();
-
+    const storage = createAsyncStorage('appDB');
     // chatHistory.push({ role: "user", content: userMessage });
         await addMemoryToDB("user", userMessage);
+        const temp = await storage.getItem('llmUrl')
+        const userSetLLMUrl = temp && temp !== '' ? temp : LM_STUDIO_URL as string;
 
     try {
-        let rawResponse = await fetch(LM_STUDIO_URL, {
+        let rawResponse = await fetch(userSetLLMUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -66,7 +69,7 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
                 await addMemoryToDB("tool", typeof result.content === 'string' ? result.content : JSON.stringify(result.content));
             }
 
-            let nextRawResponse = await fetchAgentResponse();
+            let nextRawResponse = await fetchAgentResponse(userSetLLMUrl);
             let nextData = await nextRawResponse.json();
 
             if (!nextData || !nextData.choices || !nextData.choices[0] || !nextData.choices[0].message) {
@@ -102,8 +105,8 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
     }
 }
 
-const fetchAgentResponse = async (): Promise<any> => {
-    return await fetch(LM_STUDIO_URL, {
+const fetchAgentResponse = async (llmUrl: string): Promise<any> => {
+    return await fetch(llmUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

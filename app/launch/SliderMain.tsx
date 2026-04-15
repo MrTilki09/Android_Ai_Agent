@@ -12,7 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 export const SliderMain = () => {
 
     const storage = createAsyncStorage("appDB");
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const numberOfPages = 2;
     const navigation = useNavigation();
 

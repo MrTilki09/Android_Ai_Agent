@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { DigitalTwinLimitRules, GetDigitalTwinLimitRules } from "../components/userFunctions";
 import DigitalTwinLimitsViewModal from "../components/modals/DigitalTwinLimitsViewModal";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import LlmUrlUpdateModal from "../components/modals/LlmUrlUpdateModal";
 
 export default function Settings() {
     const { backgroundColor } = useTheme();
 
     const [showLimitsModal, setShowLimitsModal] = useState(false);
+    const [showLlmUrlModal, setShowLlmUrlModal] = useState(false);
     const translateY = useSharedValue(100);
     const opacity = useSharedValue(0);
 
@@ -31,6 +33,7 @@ export default function Settings() {
 
             <>
                 <DigitalTwinLimitsViewModal visible={showLimitsModal} onClose={() => setShowLimitsModal(false)} />
+                <LlmUrlUpdateModal visible={showLlmUrlModal} onClose={() => setShowLlmUrlModal(false)} />
             </>
 
             <View className="flex-row items-start justify-start self-start ml-4 mt-6">
@@ -49,6 +52,9 @@ export default function Settings() {
             <Animated.View className="mt-4" style={animatedStyle}>
                 <TouchableOpacity className="mt-12   w-full py-4 rounded-lg border-y border-white self-center" onPress={() => setShowLimitsModal(true)}>
                     <Text className="text-lg text-white text-center">Digital Twin Limits</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="mt-12   w-full py-4 rounded-lg border-y border-white self-center" onPress={() => setShowLlmUrlModal(true)}>
+                    <Text className="text-lg text-white text-center">LM Studio URL</Text>
                 </TouchableOpacity>
             </Animated.View>
         </View>

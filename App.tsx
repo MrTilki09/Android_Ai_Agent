@@ -75,8 +75,9 @@ function AppContent() {
   }, [success, error, status]);
 
   useEffect(() => {
-    const checkFirstLaunch = async () => {
+    const checkFirstLaunch = async () => {console.log("Checking first launch...");
       const value = await storage.getItem("first_launch");
+      console.log("First Launch Value:", value);
       if (value === "true") {
         firstLaunchChecked = true;
       }
@@ -105,7 +106,7 @@ function AppContent() {
             headerShown: false  // This hides the entire header
           }}
         >          
-        {firstLaunchChecked && (
+        {!firstLaunchChecked && (
           <Drawer.Screen name="sss" component={SliderMain} 
            options={{
                 drawerItemStyle: { display: 'none' } // Hide from drawer menu
