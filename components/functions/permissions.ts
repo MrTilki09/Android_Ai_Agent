@@ -1,6 +1,9 @@
 import { Alert, NativeModules, PermissionsAndroid, Platform } from "react-native";
 
-
+export async function CheckUsageStatsPermission() {
+    // Call your custom Kotlin check instead of PermissionsAndroid
+    return await NativeModules.UsageStats.hasUsagePermission();
+}
 
 
 export async function RequestPermissions() {
@@ -8,6 +11,7 @@ export async function RequestPermissions() {
     PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
         PermissionsAndroid.PERMISSIONS.SEND_SMS,
+        'android.permission.SYSTEM_ALERT_WINDOW' as any,
         'android.permission.INTERNET' as any,
         'android.permission.SCHEDULE_EXACT_ALARM' as any,
         'android.permission.USE_EXACT_ALARM' as any,

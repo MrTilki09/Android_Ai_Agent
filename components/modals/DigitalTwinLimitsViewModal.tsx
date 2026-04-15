@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { Modal, View, Text, ScrollView, TouchableOpacity, Pressable } from "react-native";
-import Animated, { 
-    useSharedValue, 
-    useAnimatedStyle, 
-    withTiming, 
-    withSpring, 
-    runOnJS 
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    withSpring,
+    runOnJS
 } from "react-native-reanimated";
-import { GetDigitalTwinLimitRules } from "../userFunctions";
+import { getCurrentUsageLimits, GetDigitalTwinLimitRules } from "../userFunctions";
 import { UsageLimit } from "../interfaces";
 
 export default function DigitalTwinLimitsViewModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
     const [currentRules, setCurrentRules] = useState<UsageLimit[]>([]);
-    
+
     // Local state to keep the Modal mounted while the exit animation plays
     const [isRendered, setIsRendered] = useState(false);
 
@@ -25,7 +25,9 @@ export default function DigitalTwinLimitsViewModal({ visible, onClose }: { visib
     useEffect(() => {
         if (visible) {
             const fetch = async () => {
+                getCurrentUsageLimits(); // Fetch current limits from native module (for logging/debugging)
                 const rules = await GetDigitalTwinLimitRules();
+                console.log("Fetched Twin Limit Rules for Modal:", rules);
                 setCurrentRules(rules);
             }
             fetch();
@@ -68,24 +70,24 @@ export default function DigitalTwinLimitsViewModal({ visible, onClose }: { visib
     if (!isRendered) return null;
 
     return (
-        <Modal 
+        <Modal
             animationType="none" // Turn off default janky animations
-            transparent={true} 
-            visible={isRendered} 
+            transparent={true}
+            visible={isRendered}
             onRequestClose={onClose}
         >
             {/* Animated Backdrop */}
             <Animated.View style={[{ flex: 1 }, backdropStyle]}>
-                <Pressable 
-                    className="absolute inset-0 bg-black bg-opacity-40" 
-                    onPress={onClose} 
+                <Pressable
+                    className="absolute inset-0 bg-black bg-opacity-40"
+                    onPress={onClose}
                 />
-                
+
                 <View className="flex-1 items-center justify-center px-6" pointerEvents="box-none">
-                    
+
                     {/* Animated Modal Content */}
-                    <Animated.View 
-                        className="w-full max-w-sm bg-white rounded-xl shadow-lg" 
+                    <Animated.View
+                        className="w-full max-w-sm bg-white rounded-xl shadow-lg"
                         pointerEvents="auto"
                         style={modalStyle}
                     >

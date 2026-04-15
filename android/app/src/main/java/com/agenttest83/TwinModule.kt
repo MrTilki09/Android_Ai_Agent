@@ -27,6 +27,24 @@ class TwinModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMo
     }
 
     @ReactMethod
+    fun getAppLimits(promise: Promise) {
+        try {
+            val currentLimits = Arguments.createMap()
+            val staticLimits = DigitalTwinService.appLimits
+
+            for ((packageName, limitInMillis) in staticLimits) {
+                // Convert milliseconds back to minutes for JS
+                val minutes = (limitInMillis / (60 * 1000)).toInt()
+                currentLimits.putInt(packageName, minutes)
+            }
+
+            promise.resolve(currentLimits)
+        } catch (e: Exception) {
+            promise.reject("ERROR_GETTING_LIMITS", e.message)
+        }
+    }
+
+    @ReactMethod
     fun isAccessibilityServiceEnabled(promise: Promise) {
         try {
             val context = reactApplicationContext

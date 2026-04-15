@@ -37,6 +37,22 @@ export function formatUsageTime(milliseconds: number): string {
     return `${seconds}s`;
 }
 
+
+
+export async function handleFirstAppLaunch (){
+
+
+    try{
+        
+    }
+    catch(error){
+        console.error("Error handling first app launch:", error);
+    }
+
+
+}
+
+
 export async function DigitalTwinLimitRules() {
 
 
@@ -62,6 +78,20 @@ export async function DigitalTwinLimitRules() {
     }
     
     return twinRules;
+}
+
+export function getCurrentUsageLimits() {
+
+    try {
+        const limits = NativeModules.TwinAgent.getAppLimits();
+        console.log("Current usage limits from TwinAgent:", limits);
+        return limits;
+    }
+    catch (error) {
+        console.error("Error getting current usage limits from TwinAgent:", error);
+        return null;
+    }
+
 }
 
 

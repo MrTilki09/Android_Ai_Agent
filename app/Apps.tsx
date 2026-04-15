@@ -3,8 +3,8 @@ import { Image, ScrollView, Text, View } from "react-native";
 import { FetchUsageStats, formatUsageTime } from "../components/userFunctions";
 import { UsageStats } from "../components/interfaces";
 import DrawerButton from "../components/buttons/DrawerButton";
-import { CheckUsageStatsPermission } from "../components/RequestPermissions";
 import { createAsyncStorage } from "@react-native-async-storage/async-storage";
+import { CheckUsageStatsPermission } from "../components/functions/permissions";
 
 
 

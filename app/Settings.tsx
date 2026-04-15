@@ -47,9 +47,9 @@ export default function Settings() {
             
             {/* Body  */}
             <Animated.View className="mt-4" style={animatedStyle}>
-                <Pressable className="mt-12 bg-gray-400  w-full py-4 rounded-lg self-center" onPress={() => setShowLimitsModal(true)}>
+                <TouchableOpacity className="mt-12   w-full py-4 rounded-lg border-y border-white self-center" onPress={() => setShowLimitsModal(true)}>
                     <Text className="text-lg text-white text-center">Digital Twin Limits</Text>
-                </Pressable>
+                </TouchableOpacity>
             </Animated.View>
         </View>
     );

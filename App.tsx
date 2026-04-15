@@ -15,8 +15,15 @@ import { Apps } from "./app/Apps";
 import { Chat } from "./app/Chat";
 import { useEffect } from 'react';
 import { useMigrations } from "drizzle-orm/op-sqlite/migrator";
-import { addDemoData, clearMemory, db, testDatabase } from "./src/db/client";
+import { addDemoData, clearMemory, db } from "./src/db/client";
 import migrations from './drizzle/migrations';
+import { SliderMain } from "./app/launch/SliderMain";
+import { createAsyncStorage } from "@react-native-async-storage/async-storage";
+import LoginLoader from "./app/loaders/LoginLoader";
+import { useMutation } from "@tanstack/react-query";
+import { handleFirstAppLaunch } from "./components/userFunctions";
+
+
 
 const linking = {
   prefixes: ['agenttest83://'],
@@ -42,47 +49,69 @@ function App() {
   
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer linking={linking} fallback={<View />}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <AppContent />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <NavigationContainer linking={linking} fallback={<View />}>
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <AppContent />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }
 
 function AppContent() {
   const dimensions = useWindowDimensions();
-  
-  // useEffect(() => {
-  //   // Test the database connection on app start
-  //   // const testDbConnection = async () => {
-  //   //   clearMemory();
-  //   //   testDatabase();
-  //   // };
+  const { success, error } = useMigrations(db, migrations);
+  const storage = createAsyncStorage("appDB");
+  var firstLaunchChecked = false;
+  const { mutateAsync: handleFirstLaunch , status} = useMutation({
+    mutationFn: handleFirstAppLaunch
+  });
 
-  //   testDbConnection();
-  // }, []);
-  // Initialize database once React is ready
-const { success, error } = useMigrations(db, migrations);
+
+  useEffect(() => {
+    console.log("Migrations - Success:", success, "Error:", error);
+  }, [success, error, status]);
+
+  useEffect(() => {
+    const checkFirstLaunch = async () => {
+      const value = await storage.getItem("first_launch");
+      if (value === "true") {
+        firstLaunchChecked = true;
+      }
+    };
+    handleFirstLaunch();
+    checkFirstLaunch();
+  }, [handleFirstLaunch]);
 
   if (error) {
     return <Text>Migration Error: {error.message}</Text>;
   }
 
-  if (!success) {
-    return <Text>Loading Migrations...</Text>;
+  if (!success && status === "idle") {
+    return (
+      <LoginLoader />
+    );
   }
+
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <Drawer.Navigator
           screenOptions={{
             drawerType: dimensions.width >= 768 ? 'permanent' : 'front',
             headerShown: false  // This hides the entire header
           }}
-        >
+        >          
+        {firstLaunchChecked && (
+          <Drawer.Screen name="sss" component={SliderMain} 
+           options={{
+                drawerItemStyle: { display: 'none' } // Hide from drawer menu
+              }} />
+        )}
+
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="Chat" component={Chat} />
           <Drawer.Screen name="Settings" component={Settings} />
@@ -96,7 +125,6 @@ const { success, error } = useMigrations(db, migrations);
           />
         </Drawer.Navigator>
       </ThemeProvider>
-    </QueryClientProvider>
     </SafeAreaView>
   );
 }

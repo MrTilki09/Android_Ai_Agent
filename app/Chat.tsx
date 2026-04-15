@@ -21,10 +21,10 @@ export function Chat() {
     useEffect(() => {
         const initializeChat = async () => {
             const dbMessages = await allMemoryFromDB();
-            setMessages(dbMessages.map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })));
+            setMessages(dbMessages.filter((msg) => msg.role !== "tool").map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })));
         };
 
-initializeChat();
+        initializeChat();
     }, []);
    
 

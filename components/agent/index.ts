@@ -20,10 +20,6 @@ const tools: OpenAI.Chat.ChatCompletionTool[] = agentFunctions as OpenAI.Chat.Ch
 
 
 
-// let chatHistory: OpenAI.Chat.ChatCompletionMessageParam[] = [
-//     { role: "system", content: "You are a helpful assistant running locally on LM Studio. Use your tools when needed." }
-// ];
-
 
 export async function startAgent(userMessage: string, setBackgroundColor?: (color: string) => void) {
 
@@ -62,18 +58,11 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
                 aiMessage.content = "";
             }
 
-            // chatHistory.push(aiMessage);
-            await addMemoryToDB("assistant", aiMessage.content);
-
             console.log(`[Agent] Iteration ${iteration}: Processing ${aiMessage.tool_calls.length} tool call(s)`);
             const toolResults = await handleToolCall.handle(aiMessage, setBackgroundColor);
 
             for (const result of toolResults) {
-                // chatHistory.push({
-                //     role: "tool",
-                //     tool_call_id: result.tool_call_id,
-                //     content: typeof result.content === 'string' ? result.content : JSON.stringify(result.content)
-                // });
+            
                 await addMemoryToDB("tool", typeof result.content === 'string' ? result.content : JSON.stringify(result.content));
             }
 
@@ -99,15 +88,13 @@ export async function startAgent(userMessage: string, setBackgroundColor?: (colo
                 .replace(/\[THINK\][\s\S]*?\[\/THINK\]/gi, '')
                 .trim();
 
-            if (cleaned) {
-                    // chatHistory.push({ role: "assistant", content: cleaned });
-                    await addMemoryToDB("assistant", cleaned);
+            if (cleaned) {                    
+                await addMemoryToDB("assistant", cleaned);
                 return cleaned;
             }
         }
 
         console.error("No content in AI message:", aiMessage);
-        // console.error("Chat history length:", chatHistory.length);
         return "The AI did not return any content.";
 
     } catch (error) {
