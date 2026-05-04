@@ -4,6 +4,8 @@ import com.facebook.react.bridge.*
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.view.accessibility.AccessibilityManager
+import android.accessibilityservice.AccessibilityServiceInfo
 
 class TwinModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -48,15 +50,17 @@ class TwinModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMo
     fun isAccessibilityServiceEnabled(promise: Promise) {
         try {
             val context = reactApplicationContext
-            
-            // Get the enabled services string
-            val enabledServices = Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            ) ?: ""
+            val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
 
-            // Check if our DigitalTwinService is in the enabled services
-            val isServiceEnabled = enabledServices.contains("com.agenttest83/.DigitalTwinService")
+            // Get list of currently enabled services
+            val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+
+            // Check if any enabled service matches your component name
+            val isServiceEnabled = enabledServices.any {
+                it.resolveInfo.serviceInfo.packageName == context.packageName &&
+                        it.resolveInfo.serviceInfo.name == "com.agenttest83.DigitalTwinService"
+            }
+
             promise.resolve(isServiceEnabled)
         } catch (e: Exception) {
             promise.reject("ERROR", "Failed to check accessibility service", e)

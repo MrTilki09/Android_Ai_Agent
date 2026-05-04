@@ -13,7 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { Apps } from "./app/Apps";
 import { Chat } from "./app/Chat";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMigrations } from "drizzle-orm/op-sqlite/migrator";
 import { addDemoData, clearMemory, db } from "./src/db/client";
 import migrations from './drizzle/migrations';
@@ -46,7 +46,7 @@ const queryClient = new QueryClient()
 function App() {
 
   const isDarkMode = useColorScheme() === 'dark';
-  
+
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -64,8 +64,8 @@ function AppContent() {
   const dimensions = useWindowDimensions();
   const { success, error } = useMigrations(db, migrations);
   const storage = createAsyncStorage("appDB");
-  var firstLaunchChecked = false;
-  const { mutateAsync: handleFirstLaunch , status} = useMutation({
+  const [firstLaunchChecked, setFirstLaunchCompleted] = useState(false);
+  const { mutateAsync: handleFirstLaunch, status } = useMutation({
     mutationFn: handleFirstAppLaunch
   });
 
@@ -75,11 +75,12 @@ function AppContent() {
   }, [success, error, status]);
 
   useEffect(() => {
-    const checkFirstLaunch = async () => {console.log("Checking first launch...");
+    const checkFirstLaunch = async () => {
+      console.log("Checking first launch...");
       const value = await storage.getItem("first_launch");
       console.log("First Launch Value:", value);
       if (value === "true") {
-        firstLaunchChecked = true;
+        setFirstLaunchCompleted(true);
       }
     };
     handleFirstLaunch();
@@ -105,20 +106,20 @@ function AppContent() {
             drawerType: dimensions.width >= 768 ? 'permanent' : 'front',
             headerShown: false  // This hides the entire header
           }}
-        >          
-        {!firstLaunchChecked && (
-          <Drawer.Screen name="sss" component={SliderMain} 
-           options={{
+        >
+          {!firstLaunchChecked && (
+            <Drawer.Screen name="sss" component={SliderMain}
+              options={{
                 drawerItemStyle: { display: 'none' } // Hide from drawer menu
               }} />
-        )}
+          )}
 
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="Chat" component={Chat} />
           <Drawer.Screen name="Settings" component={Settings} />
           <Drawer.Screen name="Apps" component={Apps} />
-          <Drawer.Screen 
-            name="Intervention" 
+          <Drawer.Screen
+            name="Intervention"
             component={Intervention}
             options={{
               drawerItemStyle: { display: 'none' } // Hide from drawer menu

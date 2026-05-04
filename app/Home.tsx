@@ -3,7 +3,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
 import DrawerButton from "../components/buttons/DrawerButton";
 import { useEffect } from "react";
-import { CheckAssessibilityPermission, RequestPermissions } from "../components/functions/permissions";
+import { CheckAndRequestUsageStatsPermission, CheckAssessibilityPermission, handleRequiredPermissionsLaunch, RequestPermissions } from "../components/functions/permissions";
 import { images } from "../components/uploads/images";
 
 export function Home() {
@@ -15,9 +15,8 @@ useEffect(() => {
         const initializeApp = async () => {
             // Initialize Twin Limits
 
-            await RequestPermissions();
-            await CheckAssessibilityPermission();
-           
+            await handleRequiredPermissionsLaunch();
+            // we also need to check app usage access
         };
 
         initializeApp();

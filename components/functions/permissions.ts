@@ -36,6 +36,20 @@ export async function RequestPermissions() {
 }
 
 
+export async function CheckAndRequestUsageStatsPermission() {
+    const hasPermission = await CheckUsageStatsPermission();
+    if (!hasPermission) {
+        await RequestPermissions();
+    }
+}
+
+export async function handleRequiredPermissionsLaunch (){
+    await RequestPermissions();
+    await CheckAssessibilityPermission();
+    await CheckAndRequestUsageStatsPermission();
+}
+
+
 export async function CheckAssessibilityPermission(): Promise<boolean> {
     try {
         const isEnabled = await NativeModules.TwinAgent.isAccessibilityServiceEnabled();

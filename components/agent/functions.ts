@@ -82,7 +82,7 @@ export const agentFunctions = [
                     properties: {
                         twinLimits: { 
                             type: "object", 
-                            description: "The usage limits for each app in minutes. Example: {\"com.facebook.katana\": 30, \"com.instagram.android\": 20, \"com.snapchat.android\": 10, \"com.reddit.frontpage\": 25, \"com.android.chrome\": 0, \"com.twitter.android\": 0}" 
+                            description: "The usage limits for each app in minutes. Example: {\"com.google.android.youtube\": 30, \"com.instagram.android\": 20, \"com.snapchat.android\": 10, \"com.reddit.frontpage\": 25, \"com.android.chrome\": 0, \"com.twitter.android\": 0}" 
                         }
                     },
                     required: ['twinLimits']
