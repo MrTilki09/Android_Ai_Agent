@@ -9,6 +9,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { getCurrentUsageLimits, GetDigitalTwinLimitRules } from "../userFunctions";
 import { UsageLimit } from "../interfaces";
+import { TextInput } from "react-native-gesture-handler";
+import { HandleToolCall } from "../agent/handleToolCall";
 
 export default function DigitalTwinLimitsViewModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
     const [currentRules, setCurrentRules] = useState<UsageLimit[]>([]);
@@ -104,9 +106,35 @@ export default function DigitalTwinLimitsViewModal({ visible, onClose }: { visib
                                         <Text className="text-sm font-medium text-gray-700 flex-1">
                                             {rule.packageName.split('.').pop() || rule.packageName}
                                         </Text>
-                                        <View className="bg-blue-50 rounded px-2 py-1">
-                                            <Text className="text-xs font-semibold text-blue-600">{rule.limit}m</Text>
-                                        </View>
+                                        {/* <View className="bg-blue-50 rounded px-2 py-1">
+                                            <Text className="text-xs font-semibold text-blue-600">
+                                                {rule.limit} m
+                                            </Text>
+                                        </View> */}
+                                        <TextInput className="ml-4 w-16 rounded border border-gray-300 px-2 py-1 text-center text-sm"
+                                            value={rule.limit.toString()}
+                                            onChangeText={(text) => {
+                                                const newLimit = parseInt(text) || 0;
+                                                setCurrentRules(prevRules => {
+                                                    const updatedRules = [...prevRules];
+                                                    updatedRules[index].limit = newLimit;
+                                                    return updatedRules;
+                                                });
+                                                console.log( currentRules);
+                                                const Tools = new HandleToolCall();
+                                                const filteredRules = currentRules.filter(rule => rule.packageName.startsWith('com.'));
+                                                const limitsObj = filteredRules.reduce((acc, rule) => {
+                                                    acc[rule.packageName] = rule.limit;
+                                                    return acc;
+                                                }, {} as Record<string, number>);
+                                                Tools.setUsageLimits(limitsObj);
+                                            
+                                            }}
+                                            keyboardType="numeric"
+                                        />
+                                        <Text className=" ml-2 text-xs font-semibold text-blue-600">
+                                            m
+                                        </Text>
                                     </View>
                                 ))
                             ) : (
@@ -114,6 +142,7 @@ export default function DigitalTwinLimitsViewModal({ visible, onClose }: { visib
                                     <Text className="text-sm text-gray-500">No limits set</Text>
                                 </View>
                             )}
+
                         </ScrollView>
 
                         {/* Footer */}

@@ -36,6 +36,8 @@ export function Chat() {
                 ...prev,
                 { role: "assistant", content: data ?? "..." },
             ]);
+
+           
         },
     });
 

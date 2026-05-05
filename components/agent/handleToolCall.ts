@@ -144,9 +144,17 @@ export class HandleToolCall {
             return rules ? JSON.parse(rules) : {};
         });
 
-        // Merge: existingRules first, then override with twinLimits
+        // Filter out numeric keys (array indices) from existingRules
+        const cleanExistingRules = Object.keys(existingRules)
+            .filter(key => isNaN(Number(key)))
+            .reduce((acc, key) => {
+                acc[key] = existingRules[key];
+                return acc;
+            }, {} as Record<string, any>);
+
+        // Merge: cleanExistingRules first, then override with twinLimits
         // This ensures twinLimits takes precedence for any matching keys
-        const twinRules = { ...existingRules, ...twinLimits };
+        const twinRules = { ...cleanExistingRules, ...twinLimits };
 
         await storage.setItem("twinRules", JSON.stringify(twinRules));
         console.log("Digital Twin Limit Rules set:", twinRules);
